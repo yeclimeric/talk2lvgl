@@ -474,3 +474,8 @@ LVGL_PAGE=stitch_smart_home_panel tools/lvgl-runtime.sh screenshot output.png
 | [docs/llm_codegen_rules.md](docs/llm_codegen_rules.md) | LLM 代码生成约束规则 |
 | [docs/board_profiles.md](docs/board_profiles.md) | Board profile 配置说明 |
 | [docs/lvgl-sdl-cross-machine-deployment.md](docs/lvgl-sdl-cross-machine-deployment.md) | 跨机器部署指南 |
+
+## 致谢
+
+感谢 LinuxDo 社区的支持！
+![LinuxDo](https://img.shields.io/badge/LinuxDo-%E7%A4%BE%E5%8C%BA%E6%94%AF%E6%8C%81-blue)

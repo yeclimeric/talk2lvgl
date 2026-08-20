@@ -475,3 +475,8 @@ Manual parameters still work and take priority:
 | [docs/llm_codegen_rules.md](docs/llm_codegen_rules.md) | LLM code generation constraint rules |
 | [docs/board_profiles.md](docs/board_profiles.md) | Board profile configuration guide |
 | [docs/lvgl-sdl-cross-machine-deployment.md](docs/lvgl-sdl-cross-machine-deployment.md) | Cross-machine deployment guide |
+
+## Acknowledgments
+
+Thanks to the LinuxDo community for the support!
+![LinuxDo](https://img.shields.io/badge/LinuxDo-Community_Support-blue)
