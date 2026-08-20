@@ -218,3 +218,22 @@ indicators, a stop button for cancelling running tasks, and result visualization
 
 The Web UI stores LLM settings (API key, model, base URL) in `workspace/.llm_settings.json`,
 which is also read by `tools/llm_client.py` for CLI usage.
+
+## Layered Responsibilities
+
+- **Page layer** (`runtime_project/src/`) — built-in example pages implementing `xxx_page_create()` and `xxx_page_get_content_root()`
+- **Registry layer** (`page_registry.c`) — built-in page id → function mapping; workspace user tasks are registered automatically via `sync-generated-pages.py`
+- **Runtime layer** (`main.c`) — LVGL + SDL initialization; selects the page via the `LVGL_PAGE` environment variable; supports both viewport and full-page screenshot modes
+- **Validation layer** (`page-validate.py`) — PIL pixel-level diff; produces the three-column comparison and a structured JSON report
+- **Build layer** (`CMakeLists.txt`) — generates the config from `lv_conf.defaults` and outputs an isolated `build/<task_id>/lvgl_runtime_demo` per task
+
+## CMake Dependencies
+
+```text
+lvgl_runtime_demo (executable)
+  ├── src/main.c, page_registry.c, home_page.c, token_page.c,
+  │   stitch_smart_home_panel_page.c, image_converter_page.c,
+  │   copy_scan_print_setup_page.c  (built-in example pages)
+  ├── generated_page_registry.c (auto-generated for workspace user tasks)
+  └── lvgl (static library) → SDL2, SDL2_image, FreeType, lodepng
+```
