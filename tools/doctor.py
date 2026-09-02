@@ -19,9 +19,24 @@ DOCTOR_TMP_DIR = REPO_ROOT / ".tmp"
 DEMO_TASK = REPO_ROOT / "workspace" / "tasks" / "demo_v1" / "task.json"
 DEMO_REFERENCE = REPO_ROOT / "workspace" / "tasks" / "demo_v1" / "reference" / "reference.png"
 LOCAL_SDL2_IMAGE_ROOT = REPO_ROOT / ".deps" / "sdl2-image" / "root" / "usr"
-LOCAL_SDL2_IMAGE_PKGCONFIG = LOCAL_SDL2_IMAGE_ROOT / "lib" / "x86_64-linux-gnu" / "pkgconfig"
+
+
+def detect_local_sdl_paths() -> tuple[Path, Path]:
+    candidates = (
+        LOCAL_SDL2_IMAGE_ROOT / "lib" / "pkgconfig",
+        LOCAL_SDL2_IMAGE_ROOT / "lib" / "x86_64-linux-gnu" / "pkgconfig",
+        LOCAL_SDL2_IMAGE_ROOT / "lib" / "aarch64-linux-gnu" / "pkgconfig",
+        LOCAL_SDL2_IMAGE_ROOT / "lib" / "arm64-linux-gnu" / "pkgconfig",
+        LOCAL_SDL2_IMAGE_ROOT / "local" / "lib" / "pkgconfig",
+    )
+    for pkgconfig_dir in candidates:
+        if (pkgconfig_dir / "SDL2_image.pc").is_file():
+            return pkgconfig_dir, pkgconfig_dir.parent
+    return candidates[0], candidates[0].parent
+
+
+LOCAL_SDL2_IMAGE_PKGCONFIG, LOCAL_SDL2_IMAGE_LIBDIR = detect_local_sdl_paths()
 LOCAL_SDL2_IMAGE_PC = LOCAL_SDL2_IMAGE_PKGCONFIG / "SDL2_image.pc"
-LOCAL_SDL2_IMAGE_LIBDIR = LOCAL_SDL2_IMAGE_ROOT / "lib" / "x86_64-linux-gnu"
 
 
 @dataclass

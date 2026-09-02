@@ -15,6 +15,8 @@ git -C lv_port_linux_test submodule update --init --recursive
 
 ## 2. Install core dependencies
 
+### Linux (recommended path)
+
 ```bash
 # 1) System-level build dependencies: SDL/FreeType dev headers + toolchain
 sudo apt update
@@ -32,6 +34,112 @@ sudo apt install -y \
 pip install -U "Pillow>=9.1" flask httpx
 ```
 
+### macOS
+
+On macOS, the project is expected to work with the native Homebrew toolchain and the repo-local SDL fallback detection logic. The helper scripts no longer assume a Linux-only `x86_64-linux-gnu` path and automatically detect the platform-specific library directory.
+
+#### Recommended one-click setup
+
+From the repository root:
+
+```bash
+./tools/setup-macos.sh
+```
+
+This installs the required Homebrew packages, Python dependencies, and the upstream `lv_port_linux_test` checkout, then runs the built-in doctor check and the bundled quickstart demo.
+
+Useful variants:
+
+```bash
+./tools/setup-macos.sh --doctor-only
+./tools/setup-macos.sh --skip-brew
+./tools/setup-macos.sh --skip-quickstart
+```
+
+#### Manual setup (if you prefer to do it yourself)
+
+```bash
+xcode-select --install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+brew install cmake pkg-config python@3.12 sdl2 sdl2_image freetype
+python3 -m pip install -U "Pillow>=9.1" flask httpx
+
+git clone https://github.com/lvgl/lv_port_linux.git lv_port_linux_test
+git -C lv_port_linux_test submodule update --init --recursive
+```
+
+#### Apple Silicon vs Intel notes
+
+- Apple Silicon: Homebrew is usually installed under `/opt/homebrew`.
+- Intel: Homebrew is usually installed under `/usr/local`.
+- The setup script and runtime helpers automatically add the correct prefix to `PATH` and detect the right SDL pkg-config directory.
+
+#### macOS troubleshooting
+
+If `pkg-config` cannot find `SDL2_image`, confirm the issue is not a missing Homebrew install or PATH mismatch:
+
+```bash
+which brew
+brew --prefix
+pkg-config --list-all | grep SDL2_image
+pkg-config --modversion sdl2
+pkg-config --modversion SDL2_image
+```
+
+If the repo still cannot resolve the fallback, inspect the generated log file from the automated installer:
+
+```bash
+ls -1 .tmp
+```
+
+The log file contains the exact step where the installation or doctor check failed. The helper scripts automatically detect the correct library directory for both `arm64` and `x86_64` Macs.
+
+If the runtime dependency is still missing, re-run the same doctor check:
+
+```bash
+python3 tools/doctor.py
+```
+
+#### macOS PATH and sanity check
+
+On some machines, the issue is not missing packages but a stale `PATH` or a different Homebrew prefix. Add the correct one before continuing:
+
+```bash
+# Apple Silicon
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+
+# Intel
+export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
+```
+
+Then verify the toolchain and SDL stack:
+
+```bash
+which brew
+brew --prefix
+which cmake
+which pkg-config
+which python3
+pkg-config --modversion sdl2
+pkg-config --modversion SDL2_image
+pkg-config --modversion freetype2
+```
+
+If `pkg-config` still cannot find SDL libraries, reinstall the relevant formulae and confirm that Homebrew is using the correct prefix:
+
+```bash
+brew reinstall sdl2 sdl2_image freetype
+brew info sdl2_image
+```
+
+The repo's helper scripts also support headless run modes for CI and remote environments:
+
+```bash
+bash tools/lvgl-runtime.sh run-headless
+bash tools/lvgl-sdl-sim.sh run-headless
+```
+
 ## 3. Run an environment self-check
 
 ```bash
@@ -39,6 +147,7 @@ tools/pipeline.sh doctor
 ```
 
 `doctor` checks:
+
 - `cmake`, `pkg-config`, `python3`
 - `Pillow`
 - `SDL2` / `SDL2_image` / `FreeType` (including the repo's built-in `SDL2_image` fallback)
@@ -54,11 +163,13 @@ tools/pipeline.sh quickstart
 ```
 
 This command runs the repo's built-in demo task. On success, focus on:
+
 - `workspace/tasks/demo_v1/artifacts/current.png`
 - `workspace/tasks/demo_v1/artifacts/diff.png`
 - `workspace/tasks/demo_v1/artifacts/report.json`
 
 Notes:
+
 - `quickstart` prefers the repo-provided `reference/reference.png`, so even without a browser screenshot tool installed you can complete the first full loop
 - Whether you need a browser for rendering reference images is explained in the notes of the "Build + screenshot + validate" section of the [user guide](user-guide.md)
 

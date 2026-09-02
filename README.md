@@ -51,6 +51,16 @@ HTML page design                Board Profile (resolution/fonts/constraints)
 
 ## Quick Start
 
+### macOS support
+
+This project includes a macOS setup flow for both Apple Silicon and Intel machines. The repo now ships with a one-click installer and the helper scripts automatically detect the correct Homebrew prefix and SDL library paths instead of assuming Linux-only directories.
+
+```bash
+./tools/setup-macos.sh
+```
+
+For manual setup or troubleshooting, see the [getting-started guide](docs/getting-started.md#macos).
+
 After installing the dependencies ([getting-started guide](docs/getting-started.md)):
 
 ```bash
@@ -82,14 +92,14 @@ llm2lvgl/
 
 ## Documentation
 
-| Doc | Description |
-|------|------|
-| [docs/getting-started.md](docs/getting-started.md) | Environment setup, dependency installation, self-check, built-in demo, Web UI configuration |
-| [docs/user-guide.md](docs/user-guide.md) | Creating your own task: init → content → generate → validate → export; task.json reference; manual commands |
-| [docs/architecture.md](docs/architecture.md) | System architecture, execution stages, the refine loop, and the Web UI |
-| [docs/llm_codegen_rules.md](docs/llm_codegen_rules.md) | LLM code generation constraint rules |
-| [docs/board_profiles.md](docs/board_profiles.md) | Board profile configuration guide |
-| [docs/lvgl-sdl-cross-machine-deployment.md](docs/lvgl-sdl-cross-machine-deployment.md) | Cross-machine deployment guide |
+| Doc                                                                                   | Description                                                                                                     |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [docs/getting-started.md](docs/getting-started.md)                                     | Environment setup, dependency installation, self-check, built-in demo, Web UI configuration                     |
+| [docs/user-guide.md](docs/user-guide.md)                                               | Creating your own task: init → content → generate → validate → export; task.json reference; manual commands |
+| [docs/architecture.md](docs/architecture.md)                                           | System architecture, execution stages, the refine loop, and the Web UI                                          |
+| [docs/llm_codegen_rules.md](docs/llm_codegen_rules.md)                                 | LLM code generation constraint rules                                                                            |
+| [docs/board_profiles.md](docs/board_profiles.md)                                       | Board profile configuration guide                                                                               |
+| [docs/lvgl-sdl-cross-machine-deployment.md](docs/lvgl-sdl-cross-machine-deployment.md) | Cross-machine deployment guide                                                                                  |
 
 ## Acknowledgments
 
