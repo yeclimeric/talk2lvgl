@@ -77,8 +77,6 @@ add_subdirectory("${LVGL_DIR}" lvgl)
 pkg_check_modules(FREETYPE QUIET freetype2)
 if(FREETYPE_FOUND)
   target_include_directories(lvgl PRIVATE ${FREETYPE_INCLUDE_DIRS})
-  target_link_directories(lvgl PRIVATE ${FREETYPE_LIBRARY_DIRS})
-  target_link_libraries(lvgl PRIVATE ${FREETYPE_LIBRARIES})
 else()
   message(WARNING "FreeType not found; CJK font rendering will use built-in fallback fonts")
 endif()
@@ -110,6 +108,13 @@ target_link_libraries(lvgl_runtime_demo PRIVATE
   m
   pthread
 )
+
+# lvgl is a static library, so PRIVATE link dirs/libs set on lvgl do not
+# propagate to this executable's link line. Link FreeType here explicitly.
+if(FREETYPE_FOUND)
+  target_link_directories(lvgl_runtime_demo PRIVATE ${FREETYPE_LIBRARY_DIRS})
+  target_link_libraries(lvgl_runtime_demo PRIVATE ${FREETYPE_LIBRARIES})
+endif()
 
 if(UNIX AND NOT APPLE)
   target_link_libraries(lvgl_runtime_demo PRIVATE rt)

@@ -50,6 +50,26 @@ detect_cpu_count() {
     fi
 }
 
+resolve_homebrew_pkgconfig_dirs() {
+    local candidates=(
+        "/opt/homebrew/lib/pkgconfig"
+        "/usr/local/lib/pkgconfig"
+        "/opt/local/lib/pkgconfig"
+    )
+    
+    local dirs=()
+    local candidate
+    for candidate in "${candidates[@]}"; do
+        if [[ -d "${candidate}" ]]; then
+            dirs+=("${candidate}")
+        fi
+    done
+    
+    if [[ ${#dirs[@]} -gt 0 ]]; then
+        printf '%s\n' "$(IFS=:; echo "${dirs[*]}")"
+    fi
+}
+
 sync_env_aliases() {
     if [[ -n "${LVGL_PAGE:-}" && -z "${M1_PAGE:-}" ]]; then
         export M1_PAGE="${LVGL_PAGE}"
@@ -87,11 +107,25 @@ sync_env_aliases() {
 env_with_local_sdl() {
     local pkg_config_path_value="$(resolve_local_sdl_pkgconfig_dir || true)"
     local lib_dir="$(resolve_local_sdl_lib_dir || true)"
+    local homebrew_pkg_config="$(resolve_homebrew_pkgconfig_dirs || true)"
+    
+    # Build PKG_CONFIG_PATH with local SDL first, then Homebrew, then existing paths
+    local pkg_config_path="${pkg_config_path_value}"
+    if [[ -n "${homebrew_pkg_config}" ]]; then
+        if [[ -n "${pkg_config_path}" ]]; then
+            pkg_config_path="${pkg_config_path}:${homebrew_pkg_config}"
+        else
+            pkg_config_path="${homebrew_pkg_config}"
+        fi
+    fi
+    if [[ -n "${PKG_CONFIG_PATH:-}" ]]; then
+        pkg_config_path="${pkg_config_path:+${pkg_config_path}:}${PKG_CONFIG_PATH}"
+    fi
 
-    if [[ -n "${pkg_config_path_value}" && -n "${lib_dir}" ]]; then
+    if [[ -n "${pkg_config_path}" || -n "${lib_dir}" ]]; then
         env \
-            PKG_CONFIG_PATH="${pkg_config_path_value}${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}" \
-            LD_LIBRARY_PATH="${lib_dir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" \
+            ${pkg_config_path:+PKG_CONFIG_PATH="${pkg_config_path}"} \
+            ${lib_dir:+LD_LIBRARY_PATH="${lib_dir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"} \
             "$@"
         return
     fi

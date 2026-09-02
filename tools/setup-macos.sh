@@ -170,8 +170,9 @@ install_python_packages() {
     ensure_python_bin
     log "Using Python interpreter: ${PYTHON_BIN}"
     log "Installing Python dependencies..."
-    "${PYTHON_BIN}" -m pip install --upgrade pip
-    "${PYTHON_BIN}" -m pip install --upgrade "Pillow>=9.1" flask httpx
+    log "Note: Using --break-system-packages to bypass Homebrew's externally-managed-environment protection."
+    "${PYTHON_BIN}" -m pip install --upgrade --break-system-packages pip
+    "${PYTHON_BIN}" -m pip install --upgrade --break-system-packages "Pillow>=9.1" flask httpx
 }
 
 ensure_playwright_browser() {
@@ -181,7 +182,7 @@ ensure_playwright_browser() {
     fi
 
     log "Installing Playwright browser for HTML reference rendering..."
-    "${PYTHON_BIN}" -m pip install --upgrade playwright || true
+    "${PYTHON_BIN}" -m pip install --upgrade --break-system-packages playwright || true
     if "${PYTHON_BIN}" - <<'PY'
 import importlib.util
 print('yes' if importlib.util.find_spec('playwright') else 'no')
